@@ -113,10 +113,16 @@
 
 .sequencer-row {
   display: grid;
-  grid-template-columns: 80px 30px 1fr;
+  grid-template-columns: 160px 48px 1fr;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 16px;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.sequencer-row.muted {
+  opacity: 0.45;
+  filter: grayscale(40%);
 }
 
 /* Track label */
@@ -138,14 +144,17 @@
   cursor: pointer;
 }
 
+.track-volume {
+  display: flex;
+  justify-content: center;
+}
+
 /* ===================== */
 /* STEP GRID */
 /* ===================== */
 
 .steps {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 26px;
+  display: flex;
   gap: 6px;
 }
 
@@ -197,12 +206,15 @@ input[type="number"] {
 
 /* === TRACK LABEL + MUTE === */
 .track-label {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
 }
 
+.track-name {
+  font-size: 13px;
+  color: var(--text-light);
+}
 .track-label span {
   font-size: 13px;
   color: var(--text-light);
@@ -210,12 +222,10 @@ input[type="number"] {
 
 .track-controls {
   display: flex;
-  gap: 8px;
 }
 
 /* Mute button */
-.mute-btn,
-.solo-btn {
+.mute-btn {
   width: 26px;
   height: 22px;
   border-radius: 6px;
@@ -224,18 +234,15 @@ input[type="number"] {
   color: var(--text-muted);
   font-size: 11px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* Active states */
 .mute-btn.active {
   background: var(--accent);
-  color: white;
+  color: #fff;
 }
 
-.solo-btn.active {
-  background: #f5a623;
-  color: black;
+/* Muted track visual */
+.track-row.muted {
+  opacity: 0.45;
+  filter: grayscale(40%);
 }

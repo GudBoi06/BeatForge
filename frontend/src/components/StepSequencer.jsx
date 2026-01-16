@@ -51,6 +51,10 @@ export default function StepSequencer() {
   useEffect(() => {
     masterVolumeRef.current = masterVolume;
   }, [masterVolume]);
+  
+  useEffect(() => {
+    mutedTracksRef.current = mutedTracks;
+  }, [mutedTracks]);
 
 
   /* ===========================
@@ -107,9 +111,6 @@ export default function StepSequencer() {
 };
 
 
-useEffect(() => {
-  mutedTracksRef.current = mutedTracks;
-}, [mutedTracks]);
 
   /* ===========================
      TRANSPORT CONTROLS
@@ -236,95 +237,107 @@ const preloadSounds = () => {
           </div>
           <div className="bpm-control">
             <Knob
-      label="MASTER"
-      value={Math.round(masterVolume * 100)}
-      min={0}
-      max={100}
-      step={1}
-      onChange={(v) => setMasterVolume(v / 100)}
-    />
+            label="MASTER"
+            value={Math.round(masterVolume * 100)}
+            min={0}
+            max={100}
+            step={1}
+            onChange={(v) => setMasterVolume(v / 100)}
+            />
           </div>
         </div>
       </div>
 
       {/* SEQUENCER GRID */}
-      {sounds.map((sound, rowIndex) => (
-        <div className="sequencer-row" key={sound.name}>
-          <div className="track-label">
-  <span>{sound.name}</span>
+{sounds.map((sound, rowIndex) => (
+  <div
+    key={sound.name}
+    className={`sequencer-row ${
+      mutedTracks[rowIndex] ? "muted" : ""
+    }`}
+  >
+    {/* COLUMN 1 — TRACK LABEL + MUTE */}
+    <div className="track-label">
+      <span className="track-name">{sound.name}</span>
 
-    <div className="track-controls">
+      <div className="track-controls">
         <button
-        className={`mute-btn ${mutedTracks[rowIndex] ? "active" : ""}`}
-        onClick={() => {
+          className={`mute-btn ${
+            mutedTracks[rowIndex] ? "active" : ""
+          }`}
+          onClick={() => {
             setMutedTracks(prev => {
-            const copy = [...prev];
-            copy[rowIndex] = !copy[rowIndex];
-            return copy;
+              const copy = [...prev];
+              copy[rowIndex] = !copy[rowIndex];
+              return copy;
             });
-        }}
+          }}
         >
-        M
+          M
         </button>
-    </div>
+      </div>
     </div>
 
-          {/* VOLUME */}
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volumes[rowIndex]}
-            className="volume-slider"
-            onChange={(e) => {
-              const copy = [...volumes];
-              copy[rowIndex] = Number(e.target.value);
-              setVolumes(copy);
-            }}
-          />
+    {/* COLUMN 2 — VOLUME */}
+    <div className="track-volume">
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value={volumes[rowIndex]}
+        className="volume-slider"
+        onChange={(e) => {
+          const copy = [...volumes];
+          copy[rowIndex] = Number(e.target.value);
+          setVolumes(copy);
+        }}
+      />
+    </div>
 
-          {/* STEPS */}
+    {/* COLUMN 3 — STEPS */}
+    <div
+      className="steps"
+      onMouseUp={() => (dragMode.current = null)}
+      onMouseLeave={() => (dragMode.current = null)}
+    >
+      {grid[rowIndex].map((active, stepIndex) => {
+        const isAltGroup =
+          Math.floor(stepIndex / 4) % 2 === 1;
+
+        return (
           <div
-            className="steps"
-            onMouseUp={() => (dragMode.current = null)}
-            onMouseLeave={() => (dragMode.current = null)}
-          >
-            {grid[rowIndex].map((active, stepIndex) => {
-              const isAltGroup =
-                Math.floor(stepIndex / 4) % 2 === 1;
-
-              return (
-                <div
-                  key={stepIndex}
-                  className={`step
-                    ${active ? "active" : ""}
-                    ${currentStep === stepIndex ? "current" : ""}
-                    ${isAltGroup ? "alt-group" : ""}
-                  `}
-                  onMouseDown={(e) => {
-                    if (e.button === 2) {
-                      dragMode.current = "erase";
-                      updateStep(rowIndex, stepIndex, false);
-                    } else {
-                      dragMode.current = "paint";
-                      updateStep(rowIndex, stepIndex, true);
-                    }
-                  }}
-                  onMouseEnter={() => {
-                    if (!dragMode.current) return;
-                    updateStep(
-                      rowIndex,
-                      stepIndex,
-                      dragMode.current === "paint"
-                    );
-                  }}
-                />
+            key={stepIndex}
+            className={`step
+              ${active ? "active" : ""}
+              ${currentStep === stepIndex ? "current" : ""}
+              ${isAltGroup ? "alt-group" : ""}
+            `}
+            onMouseDown={(e) => {
+              if (e.button === 2) {
+                dragMode.current = "erase";
+                updateStep(rowIndex, stepIndex, false);
+              } else {
+                dragMode.current = "paint";
+                updateStep(rowIndex, stepIndex, true);
+              }
+            }}
+            onMouseEnter={() => {
+              if (!dragMode.current) return;
+              updateStep(
+                rowIndex,
+                stepIndex,
+                dragMode.current === "paint"
               );
+            }}
+            onContextMenu={(e) => e.preventDefault()}
+            />
+            );
             })}
-          </div>
         </div>
-      ))}
+    </div>
+    ))}
+
     </div>
   );
 }
