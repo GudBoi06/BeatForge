@@ -1,0 +1,15 @@
+.home-layout {
+  display: flex;
+}
+
+.main-area {
+  flex: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace {
+  padding: 20px;
+  overflow-y: auto;
+}
